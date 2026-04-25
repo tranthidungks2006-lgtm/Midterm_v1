@@ -45,7 +45,7 @@ export default class MotobikeGame {
         this.laneDistance = (roadWidth * roadRaito) / 3; 
     
     // Nếu laneDistance đo ra lỗi hoặc bằng 0, gán mặc định cho an toàn
-    if (this.laneDistance <= 0) this.laneDistance = 3.3;
+        if (this.laneDistance <= 0) this.laneDistance = 3.3;
 
         if (this.roadLength <= 0) this.roadLength = 50;
         this.numSegments = 4;
@@ -56,6 +56,32 @@ export default class MotobikeGame {
             this.segments.push(seg);
             this.scene.add(seg);
         }
+
+        // --- KHỞI TẠO TÒA NHÀ (INSTANCED MESH) ---
+        this.buildingCount = 20; // 10 tòa mỗi bên là đủ dày
+        this.buildingSpacing = this.roadLength / (this.buildingCount / 2); // Trải đều theo chiều dài đường
+
+        const bGeo = new THREE.BoxGeometry(5, 20, 10); // Box3 tạm thời
+        const bMat = new THREE.MeshStandardMaterial({ color: 0x333333 }); // Màu xám tối cho u buồn
+        this.buildings = new THREE.InstancedMesh(bGeo, bMat, this.buildingCount);
+
+        this.dummy = new THREE.Object3D();
+        const sideOffset = (roadWidth / 2) + 3; // Đặt ra ngoài mép đường 3 đơn vị
+
+        for (let i = 0; i < this.buildingCount; i++) {
+            const isLeft = i % 2 === 0;
+            const side = isLeft ? -1 : 1;
+            // Rải đều dọc theo các segment đường hiện có
+            const z = -(Math.floor(i / 2) * this.buildingSpacing);
+            
+            this.dummy.position.set(side * sideOffset, 10, z); 
+            this.dummy.scale.set(1, 0.5 + Math.random() * 2, 1); // Cao thấp khác nhau
+            this.dummy.updateMatrix();
+            this.buildings.setMatrixAt(i, this.dummy.matrix);
+        }
+
+        this.scene.add(this.buildings);
+
     }
 
     // Đổi tên cho đồng nhất với hàm update
@@ -152,6 +178,27 @@ export default class MotobikeGame {
         }
 
         return "PLAYING";
+    }
+
+    updateBuildings(speed, deltaTime) {
+        const totalCycle = (this.buildingCount / 2) * this.buildingSpacing;
+
+        for (let i = 0; i < this.buildingCount; i++) {
+            this.buildings.getMatrixAt(i, this.dummy.matrix);
+            this.dummy.matrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
+
+            // Tòa nhà trôi về phía sau
+            this.dummy.position.z += speed * deltaTime;
+
+            // Nếu vượt quá 1 khoảng phía sau người chơi (ví dụ 20 đơn vị), teleport lên phía xa nhất
+            if (this.dummy.position.z > 20) {
+                this.dummy.position.z -= totalCycle;
+            }
+
+            this.dummy.updateMatrix();
+            this.buildings.setMatrixAt(i, this.dummy.matrix);
+        }
+        this.buildings.instanceMatrix.needsUpdate = true;
     }
 
     handleInput(keyCode) {

@@ -76,8 +76,8 @@ export class AssetLoader {
         gltfLoader.setDRACOLoader(this.dracoLoader);
 
         const commonFiles = [
-           // { name: 'gate_kieu_mai', path: '/model/Gate_KieuMai.glb' },
-           // { name: 'tree_shared', path: '/model/Tree_UET.glb' }
+           { name: 'gate_kieu_mai', path: './model/UET.glb' },
+           // { name: 'tree_shared', path: './model/Tree_UET.glb' }
         ];
 
         for (const file of commonFiles) {
