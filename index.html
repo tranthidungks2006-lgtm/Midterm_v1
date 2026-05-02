@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to UET</title>
+    <title>Where is UET's Gate?</title>
     <link rel="stylesheet" href="/src/style.css">
 </head>
 
@@ -13,26 +13,45 @@
     <div id="ui-container">
         <div id="loading-screen" class="ui-layer">
             <div style="color: #D3EBD7; font-size: 24px; font-weight: bold; letter-spacing: 2px;">
-                WELCOME TO UET...
+                WHERE IS UET'S GATE...
             </div>
             <div class="loader-icon"></div>
         </div>
 
         <div id="intro-screen" class="ui-layer hidden">
-            <h1 style="font-size: 50px;">WELCOME TO UET</h1>
+            <h1 style="font-size: 50px;">WHERE IS UET'S GATE?</h1>
             <button id="play-btn">HỌC LẦN ĐẦU</button>
         </div>
 
         <div id="tutorial-screen" class="ui-layer hidden">
-            <div style="background: rgb(7, 4, 71); padding: 20px; border: 2px solid #142143; border-radius: 10px;">
-                <h2>HƯỚNG DẪN</h2>
-                <p>Dùng phím mũi tên để di chuyển.<br>Tránh vật cản để đến cổng Kiều Mai.</p>
-                <button id="tutorial-next-btn">ĐÃ HIỂU</button>
+        <div style="background: rgb(7, 4, 71); padding: 25px; border: 2px solid #142143; border-radius: 15px; color: white; max-width: 400px; text-align: left;">
+            <h2 style="text-align: center; color: #ffcc00; margin-top: 0;">HƯỚNG DẪN</h2>
+            
+            <p>Bạn sẽ có hai hình thức chính được sử dụng để đi tìm cổng <strong>UET</strong>:</p>
+
+            <div style="margin-bottom: 15px;">
+                <h3 style="color: #00e6ff; margin-bottom: 5px;">🏍️ Xe Máy:</h3>
+                <ul style="list-style: none; padding-left: 0; margin: 0;">
+                    <li>• Sử dụng các mũi tên &larr; hoặc &rarr; để né các chướng ngại vật</li>
+                    <li>• Nhấn và giữ &uarr; để tăng tốc</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <h3 style="color: #00e6ff; margin-bottom: 5px;">🚶 Đi bộ:</h3>
+                <p style="margin: 0;">Sử dụng các mũi tên &larr;, &rarr;, &uarr;, &darr; để điều khiển nhân vật vượt qua các làn đường để đến đích</p>
+            </div>
+
+            <p style="font-style: italic; text-align: center; color: #aaa;">Chúc bạn tìm được cổng UET :)))</p>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button id="tutorial-next-btn" style="padding: 10px 30px; cursor: pointer; background: #142143; color: white; border: 1px solid #00e6ff; border-radius: 5px; font-weight: bold;">ĐÃ HIỂU</button>
             </div>
         </div>
+    </div>
 
         <div id="selection-screen" class="ui-layer hidden">
-            <h2 style="margin-bottom: 30px;">CHỌN CÁCH ĐỂ XUẤT HIỆN TẠI UET</h2>
+            <h2 style="margin-bottom: 30px;">NÀO MÌNH CÙNG TÌM CỔNG UET:33</h2>
             <div style="display: flex; gap: 20px;">
                 <div class="game-card active" id="choose-motobike">
                     <h3>XE MÁY</h3>
