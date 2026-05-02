@@ -14,10 +14,27 @@ export class Environment {
     }
 
     createSky() {
-        const skyColor = 0x87CEEB;
-        // Dùng optional chaining (?.) để an toàn hơn
-        this.scene.background = new THREE.Color(skyColor);
-        this.scene.fog = new THREE.Fog(skyColor, 50, 150);
+        // 1. Tạo một Canvas ảo để vẽ dải màu
+        const canvas = document.createElement('canvas');
+        canvas.width = 2;
+        canvas.height = 512; // Chiều cao lớn để dải màu mịn
+        const context = canvas.getContext('2d');
+
+        // 2. Tạo Gradient: Xanh nhạt ở trên (0), Xanh đậm ở dưới (1)
+        const gradient = context.createLinearGradient(0, 0, 0, 512);
+        gradient.addColorStop(0, '#6cd4fe'); // Xanh nhạt (Đỉnh bầu trời)
+        gradient.addColorStop(1, '#164b9f'); // Xanh đậm (Chân trời)
+
+        // Tô màu vào canvas
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, 2, 512);
+
+        // 3. Biến Canvas thành Texture và gán làm nền Scene
+        const backgroundTexture = new THREE.CanvasTexture(canvas);
+        this.scene.background = backgroundTexture;
+
+        // 4. Thêm sương mù trùng màu với đáy (Xanh đậm) để hòa quyện
+        this.scene.fog = new THREE.Fog(0xffffff, 50, 150);
     }
 
     createRoadSegment(mode, zPos) {

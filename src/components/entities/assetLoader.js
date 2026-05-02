@@ -11,10 +11,30 @@ export class AssetLoader {
         this.isLoadingMode = false;
         this.dracoLoader = new DRACOLoader();
         this.dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+        this.gltfLoader = new GLTFLoader();
+        this.gltfLoader.setDRACOLoader(this.dracoLoader);
+
+
     }
 
     _centerModel(model) {
         if (!model) return null;
+
+        model.traverse((node) => {
+            if (node.isMesh) {
+                // Vẽ cả hai mặt để tránh việc nhìn từ dưới lên hoặc góc hẹp bị mất hình
+                node.material.side = THREE.DoubleSide; 
+                
+                // Tối ưu cho máy yếu: Giảm độ chính xác vật liệu
+                node.material.precision = "lowp"; 
+                
+                if (node.material.map) {
+                    node.material.map.encoding = THREE.sRGBEncoding;
+                    node.material.needsUpdate = true;
+                    node.material.map.anisotropy = 1; // Giảm khử răng cưa texture để tăng FPS cho máy yếu
+                }
+            }
+        });
 
         // 1. Tính toán khung bao quanh (Bounding Box)
         const box = new THREE.Box3().setFromObject(model);
@@ -35,22 +55,14 @@ export class AssetLoader {
     // Giai đoạn 1: Chỉ nạp những gì cực nhẹ để hiện Intro ngay lập tức
     async loadMinimal() {
         console.log("Đang nạp tài nguyên tối thiểu...");
-        this.models['sign_post'] = this.createBox(0.2, 2.5, 0.2, 0x777777);
-        this.models['road_model'] = this.createBox(10, 0.1, 52, 0x555555);
-        this.models['road2_model'] = this.createBox(10, 0.1, 50, 0x555555);
-        this.models['sidewalk_model'] = this.createBox(10, 0.1, 50, 0x555555);
-        this.models['car_shared'] = this.createBox(1.8, 1.2, 3.5, 0xff0000);
-        this.models['obstacle_cone'] = this.createBox(0.5, 1, 0.5, 0xffa500);
+        this.models['road_model'] = this.createBox(10, 0.1, 52, 0x555555)
         this.models['tree_shared'] = this.createBox(0.5, 3, 0.5, 0x228B22);
-        this.models['gate_kieu_mai'] = this.createBox(12, 8, 2, 0x8B4513);
 
-        const gltfLoader = new GLTFLoader();
-        gltfLoader.setDRACOLoader(this.dracoLoader);
 
         // Nạp model quả chuối cho Intro
         console.log("🍌 Đang nạp model chuối...");
         try {
-            const bananaScene = await this._loadModel(gltfLoader, './model/chuoi.glb');
+            const bananaScene = await this._loadModel(this.gltfLoader, './model/chuoi.glb');
             if (bananaScene) {
                 const centeredBanana = this._centerModel(bananaScene);
                 this.assets.set('banana_model', centeredBanana);
@@ -65,6 +77,17 @@ export class AssetLoader {
             );
             this.assets.set('banana_model', fakeBanana);
         }
+
+        console.log("🏎️ Đang nạp Luffy cho Intro...");
+        try {
+            const playerScene = await this._loadModel(this.gltfLoader, './model/dibo.glb');
+            if (playerScene) {
+                this.assets.set('player', this._centerModel(playerScene));
+                console.log("✅ Đã có Luffy cho Intro!");
+            }
+        } catch (e) {
+            console.error("Lỗi nạp Luffy Intro:", e);
+        }
     
         this.isReady = true;
         return Promise.resolve();
@@ -72,17 +95,30 @@ export class AssetLoader {
 
     // Giai đoạn 2: Nạp ngầm các model .glb nặng nề khi người chơi đang ở Intro
     async loadHiddenAssets() {
-        const gltfLoader = new GLTFLoader();
-        gltfLoader.setDRACOLoader(this.dracoLoader);
-
         const commonFiles = [
            { name: 'gate_kieu_mai', path: './model/UET.glb' },
-           // { name: 'tree_shared', path: './model/Tree_UET.glb' }
+           { name: 'car_shared', path: './model/Low poly car.glb' },
+           { name: 'tree_shared', path: './model/caychuoi.glb' }
         ];
 
         for (const file of commonFiles) {
-            const scene = await this._loadModel(gltfLoader, file.path);
-            if (scene) this.assets.set(file.name, this._centerModel(scene));
+            const scene = await this._loadModel(this.gltfLoader, file.path);
+            if (scene) {
+                if (file.name === 'car_shared') {
+                    scene.rotation.y = Math.PI /2 ;
+
+                    scene.traverse(node => {
+                        if (node.isMesh) {
+                            node.castShadow = true;
+                            node.receiveShadow = true;
+                            // Tắt bớt các tính năng nặng nếu không cần thiết
+                            if (node.material) node.material.precision = "lowp"; 
+                        }
+                    });
+                }
+            
+                this.assets.set(file.name, this._centerModel(scene));
+            }
         }
 
         console.log("Đã nạp ngầm xong Cây và Cổng Kiều Mai!");
@@ -93,27 +129,22 @@ export class AssetLoader {
         this.isLoadingMode = true;
         this.isReady = false;
 
-        const gltfLoader = new GLTFLoader();
-        gltfLoader.setDRACOLoader(this.dracoLoader);
-
         const barFill = document.getElementById('loading-bar-fill');
 
         const files = (mode === 'motobike') ? [
             { name: 'road_model', path: './model/r1.glb' },
-            { name: 'sign_post', path: './model/d1.glb' },
             { name: 'sign_post', path: './model/d2.glb' },
             { name: 'sign_post', path: './model/d4.glb' },
-            { name: 'obstacle_cone', path: './model/rac.glb'},
             { name: 'obstacle_cone', path: './model/chan.glb'},
-            //{ name: 'player', path: './model/Motorbike.glb' }
+            { name: 'building_model', path: './model/daypho.glb'},
+            { name: 'player2', path: './model/xemay.glb' }
         ] : [
             { name: 'road2_model', path: './model/r2.glb' },
             { name: 'sidewalk_model', path: './model/s2.glb' },
-            //{ name: 'player', path: './model/Man_Walking.glb' }
         ];
 
         for (const file of files) {
-            const scene = await this._loadModel(gltfLoader, file.path);
+            const scene = await this._loadModel(this.gltfLoader, file.path);
             if (scene) {
                 const centered = this._centerModel(scene);
                 if (this.assets.has(file.name)) {
@@ -137,7 +168,26 @@ export class AssetLoader {
 
     _loadModel(loader, path) {
         return new Promise((resolve) => {
-            loader.load(path, (gltf) => resolve(gltf.scene), undefined, () => resolve(null));
+            loader.load(
+                path, 
+                // 1. Hàm khi nạp xong (onLoad)
+                (gltf) => {
+                    gltf.scene.traverse(node => {
+                        if (node.isMesh && node.material.map) {
+                            node.material.map.flipY = false;
+                            node.material.map.needsUpdate = true;
+                        }
+                    });
+                    resolve(gltf.scene);
+                },
+                // 2. Hàm theo dõi tiến trình (onProgress) - Cần giữ chỗ để không bị lệch tham số
+                undefined, 
+                // 3. Hàm xử lý lỗi thực sự (onError)
+                (error) => {
+                    console.error(`❌ Lỗi thực sự khi nạp model tại ${path}:`, error);
+                    resolve(null);
+                }
+            ); 
         });
     }
 

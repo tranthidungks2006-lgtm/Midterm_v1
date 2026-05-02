@@ -5,7 +5,7 @@ export default class IntroScene {
         this.scene = scene;
         this.assetLoader = assetLoader;
         this.group = new THREE.Group();
-        this.mesh = null;
+        this.playerModel = null;
         this.bananas = [];
     }
 
@@ -16,6 +16,19 @@ export default class IntroScene {
             console.error("AssetLoader chưa được truyền vào Intro!");
             return;
         }
+
+        const loadedModel = this.assetLoader.get('player'); // Đảm bảo tên key đúng với lúc bạn load
+        if (loadedModel) {
+            this.playerModel = loadedModel.clone();
+            this.group.add(this.playerModel);
+        } else {
+            // Fallback nếu không tìm thấy model
+            const geometry = new THREE.BoxGeometry(2, 2, 2);
+            const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+            this.playerModel = new THREE.Mesh(geometry, material);
+            this.group.add(this.playerModel);
+        }
+
         const bananaModel = this.assetLoader.get('banana_model');
 
         for (let i = 0; i < 35; i++) {
@@ -37,17 +50,9 @@ export default class IntroScene {
             this.scene.add(banana);
             this.bananas.push(banana);
         }
-        // Tạo nhân vật tạm thời (Box3)
-        const geometry = new THREE.BoxGeometry(2, 2, 2);
-        const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-        this.mesh = new THREE.Mesh(geometry, material);
-        
-        this.group.add(this.mesh);
-        this.scene.add(this.group);
-        
-        // Đặt vị trí trung tâm để xoay
-        this.group.position.set(0, 0, 0);
 
+        this.scene.add(this.group);
+        this.group.position.set(0, 0, 0);
         
     }
 
@@ -68,9 +73,10 @@ export default class IntroScene {
             }
         });
 
-        if (this.mesh) {
-            this.mesh.rotation.y += 0.02; // Xoay tròn nhân vật
-            this.mesh.rotation.x += 0.01;
+        if (this.playerModel) {
+            this.playerModel.rotation.x = 0; 
+            this.playerModel.rotation.z = 0;
+            this.playerModel.rotation.y += 0.02;
         }
     }
 

@@ -37,7 +37,7 @@ body {
     justify-content: center;
     align-items: center;
     pointer-events: auto; /* Bật lại tương tác cho các nút */
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.377);
     transition: all 0.5s ease;
     backdrop-filter: blur(2px);
 }
@@ -57,7 +57,7 @@ body {
 #ui-container div {
     pointer-events: auto; /* Riêng các nút bấm thì phải click được */
     text-align: center;
-    color: white;
+    color: #D3EBD7;
 }
 
 #selection-screen > div {
@@ -72,19 +72,19 @@ body {
     flex: 1;
     min-width: 220px;
     max-width: 300px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(20, 33, 67, 0.3);
     padding: 25px;
     border-radius: 15px;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(28, 83, 137, 0.05);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .game-card.active:hover {
     transform: translateY(-10px);
-    border-color: #00b894;
-    background: rgba(0, 184, 148, 0.15);
-    box-shadow: 0 10px 30px rgba(0, 184, 148, 0.3);
+    border-color: #6DEAE8;
+    background: rgba(28, 83, 137, 0.15);
+    box-shadow: 0 10px 30px rgba(109, 234, 232, 0.3);
 }
 
 .game-card.locked {
@@ -98,7 +98,7 @@ button {
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    background: #00b894;
+    background: #179BC2;
     border: none;
     color: white;
     border-radius: 50px; /* Bo tròn kiểu hiện đại */
@@ -108,7 +108,7 @@ button {
 }
 
 button:hover { 
-    background: #55efc4; 
+    background: rgb(109, 234, 232, 75%); 
     transform: scale(1.05);
     box-shadow: 0 0 15px rgba(0, 184, 148, 0.5); 
 }
@@ -183,20 +183,20 @@ button:active {transform: scale(0.95);}
     transition: opacity 0.5s ease-out;
 }
 
-/* Chữ hiển thị phần trăm */
+/* Chữ hiển thị phần trăm 
 .loading-text {
     font-size: 14px;
     margin-bottom: 8px;
     color: #aaa;
     letter-spacing: 2px;
     text-transform: uppercase;
-}
+} */
 
 .overlay-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.85);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: white; z-index: 1000;
+    color: #D3EBD7; z-index: 1000;
 }
 
 #retry-btn { 

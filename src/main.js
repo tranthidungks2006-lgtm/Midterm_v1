@@ -110,7 +110,7 @@ class WayfinderManager {
             // LẤY MODEL THẬT ĐÃ NẠP
             let playerModel;
             if (type === 'motobike') {
-                playerModel = this.assetLoader.get('player'); 
+                playerModel = this.assetLoader.get('player2'); 
                 this.currentGame = new MotobikeGame(this.scene, this.assetLoader, this.envBuilder);
             } else {
                 playerModel = this.assetLoader.get('player'); 
@@ -242,7 +242,24 @@ class WayfinderManager {
 
         // Xử lý nút Chơi lại
         retryBtn.onclick = () => {
-            location.reload(); // Cách nhanh nhất để reset game
+            // 2. Dọn dẹp game hiện tại để tránh rác bộ nhớ
+            if (this.currentGame) {
+                this.currentGame.clear();
+                this.currentGame = null;
+            }
+            // 1. Ẩn màn hình kết thúc và HUD game
+            screen.classList.add('hidden');
+            document.getElementById('game-stats').classList.add('hidden');
+
+            // 3. Đưa camera về vị trí ban đầu của Intro để nhìn cho đẹp
+            this.camera.position.set(0, 5, 10);
+            this.camera.lookAt(0, 0, 0);
+
+            // 4. Hiển thị lại màn hình chọn Mode
+            document.getElementById('selection-screen').classList.remove('hidden');
+            
+            // 5. Cập nhật lại trạng thái quản lý[cite: 7]
+            this.currentStage = 'INTRO';
         };
     }
 

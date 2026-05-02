@@ -57,32 +57,38 @@ export default class MotobikeGame {
             this.scene.add(seg);
         }
 
-        // --- KHỞI TẠO TÒA NHÀ (INSTANCED MESH) ---
-        this.buildingCount = 20; // 10 tòa mỗi bên là đủ dày
-        this.buildingSpacing = this.roadLength / (this.buildingCount / 2); // Trải đều theo chiều dài đường
+// --- KHỞI TẠO DÃY PHỐ (CITY SEGMENTS) ---
+const cityAsset = this.loader.get('building_model');
+const cityBox = new THREE.Box3().setFromObject(cityAsset);
+this.cityBlockLength = cityBox.max.z - cityBox.min.z; 
 
-        const bGeo = new THREE.BoxGeometry(5, 20, 10); // Box3 tạm thời
-        const bMat = new THREE.MeshStandardMaterial({ color: 0x333333 }); // Màu xám tối cho u buồn
-        this.buildings = new THREE.InstancedMesh(bGeo, bMat, this.buildingCount);
+this.citySegments = [];
+// Số lượng segment dãy phố (nên khớp với số lượng segment đường để đồng bộ)
+this.numCitySegments = this.numSegments || 4; 
 
-        this.dummy = new THREE.Object3D();
-        const sideOffset = (roadWidth / 2) + 3; // Đặt ra ngoài mép đường 3 đơn vị
+const cityMargin = 1; // Khoảng cách từ mép đường đến dãy phố
+const citySideOffset = (roadWidth / 2) + cityMargin;
 
-        for (let i = 0; i < this.buildingCount; i++) {
-            const isLeft = i % 2 === 0;
-            const side = isLeft ? -1 : 1;
-            // Rải đều dọc theo các segment đường hiện có
-            const z = -(Math.floor(i / 2) * this.buildingSpacing);
-            
-            this.dummy.position.set(side * sideOffset, 10, z); 
-            this.dummy.scale.set(1, 0.5 + Math.random() * 2, 1); // Cao thấp khác nhau
-            this.dummy.updateMatrix();
-            this.buildings.setMatrixAt(i, this.dummy.matrix);
-        }
+for (let i = 0; i < this.numCitySegments; i++) {
+    // Tạo 2 dãy phố cho 2 bên đường
+    const leftSide = cityAsset.clone();
+    const rightSide = cityAsset.clone();
 
-        this.scene.add(this.buildings);
+    const zPos = i * -this.cityBlockLength;
 
-    }
+    // Đặt vị trí bên trái
+    leftSide.position.set(-citySideOffset, 0, zPos);
+    
+    // Đặt vị trí bên phải và xoay mặt lại (nếu cần)
+    rightSide.position.set(citySideOffset, 0, zPos);
+    rightSide.rotation.y = Math.PI;
+
+    this.scene.add(leftSide);
+    this.scene.add(rightSide);
+
+    // Lưu vào mảng để quản lý update
+    this.citySegments.push({ left: leftSide, right: rightSide });
+}    }
 
     // Đổi tên cho đồng nhất với hàm update
     spawnObstacle(excludeLane = null) {
@@ -209,10 +215,40 @@ export default class MotobikeGame {
         this.playerGroup.position.x = this.currentLane * this.laneDistance;
     }
 
+    // Trong motobike.js
     clear() {
-        this.scene.remove(this.playerGroup);
-        this.segments.forEach(s => this.scene.remove(s));
-        this.obstacles.forEach(o => this.scene.remove(o));
-        if (this.gate) this.scene.remove(this.gate);
+        // 1. Xóa nhân vật
+        if (this.playerGroup) {
+            this.scene.remove(this.playerGroup);
+        }
+
+        // 2. Xóa các đoạn đường
+        this.segments.forEach(seg => {
+            this.scene.remove(seg);
+        });
+        this.segments = [];
+
+        // 3. Xóa vật cản (xe, nấm, biển báo)
+        this.obstacles.forEach(obs => {
+            this.scene.remove(obs);
+        });
+        this.obstacles = [];
+
+        // 4. Xóa các tòa nhà hai bên phố
+        if (this.citySegments) {
+            this.citySegments.forEach(seg => {
+                this.scene.remove(seg.left);
+                this.scene.remove(seg.right);
+            });
+            this.citySegments = [];
+        }
+
+        // 5. Xóa cổng UET nếu đã hiện
+        if (this.gate) {
+            this.scene.remove(this.gate);
+            this.gate = null;
+        }
+
+        console.log("🧹 Đã dọn dẹp sạch sẽ Game Xe Máy!");
     }
 }
