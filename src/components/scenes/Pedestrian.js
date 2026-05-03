@@ -93,9 +93,9 @@ export default class PedestrianGame {
         group.position.set(0, 0, zPos);
 
         if (isSidewalkStrip) {
-            if (index > 0) {
+            if (index >= this.totalStrips - 10) {
                 const treeCount = 4; 
-                const positionsX = [-this.step * 2, -this.step, this.step, this.step * 2];
+                const positionsX = [-this.step * 3, -this.step*1.5, this.step*1.5, this.step * 3];
                 positionsX.sort(() => Math.random() - 0.5);
                 for (let i = 0; i < treeCount; i++) {
                     const tree = this.loader.get('tree_shared');
@@ -155,21 +155,33 @@ export default class PedestrianGame {
         if (this.isGameOver) return;
         const oldPos = this.playerGroup.position.clone();
 
-        if (keyCode === 'ArrowUp') this.playerGroup.position.z -= this.step;
-        if (keyCode === 'ArrowDown') this.playerGroup.position.z += this.step;
-        if (keyCode === 'ArrowLeft') this.playerGroup.position.x -= this.step;
-        if (keyCode === 'ArrowRight') this.playerGroup.position.x += this.step;
+        if (keyCode === 'ArrowUp') {
+            this.playerGroup.position.z -= this.step;
+            this.playerGroup.rotation.y = 0;            // Nhìn về phía trước (mặc định)
+        }
+        if (keyCode === 'ArrowDown') {
+            this.playerGroup.position.z += this.step;
+            this.playerGroup.rotation.y = Math.PI;      // Quay ra sau
+        }
+        if (keyCode === 'ArrowLeft') {
+            this.playerGroup.position.x -= this.step;
+            this.playerGroup.rotation.y = Math.PI / 2;  // Quay sang trái
+        }
+        if (keyCode === 'ArrowRight') {
+            this.playerGroup.position.x += this.step;
+            this.playerGroup.rotation.y = -Math.PI / 2; // Quay sang phải
+        }
 
         const limitX = (this.roadWidth) - 0.5;
         this.playerGroup.position.x = Math.max(-limitX, Math.min(limitX, this.playerGroup.position.x));
 
         this.playerGroup.updateMatrixWorld(true);
         this.playerBox.setFromObject(this.playerGroup);
-        this.playerBox.expandByScalar(-0.2); // Thu nhỏ box nhân vật một chút để di chuyển mượt hơn[cite: 3]
+        this.playerBox.expandByScalar(-0.2);
 
         for (let treeBox of this.treeObstacles) {
             if (this.playerBox.intersectsBox(treeBox)) {
-                // Nếu chạm cây, quay về vị trí cũ (không cho đi qua)
+                // Nếu chạm cây, quay về vị trí cũ (không cho đi qua)[cite: 5]
                 this.playerGroup.position.copy(oldPos);
                 break;
             }

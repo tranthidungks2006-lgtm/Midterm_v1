@@ -209,8 +209,21 @@ class WayfinderManager {
             // Camera bám theo (Y và Z offset)
             if (this.currentGame.playerGroup) {
                 const playerZ = this.currentGame.playerGroup.position.z;
-                this.camera.position.set(0, 8, playerZ + 10);
-                this.camera.lookAt(0, 0, playerZ - 5);
+                 if (this.currentGame instanceof PedestrianGame) {
+                    // Xoay camera 30 độ ngang quanh trục Y
+                    const angle = 30 * Math.PI / 180;
+                    const dist = 10;
+                    this.camera.position.set(
+                        dist * Math.sin(angle),        // ~5
+                        8,
+                        playerZ + dist * Math.cos(angle) // ~8.66
+                    );
+                    this.camera.lookAt(0, 0, playerZ - 2);
+                } else {
+                    // Motobike giữ nguyên
+                    this.camera.position.set(0, 8, playerZ + 10);
+                    this.camera.lookAt(0, 0, playerZ - 5);
+                }
             }
             
             // Xử lý thắng thua (bổ sung hàm showGameOverScreen nếu cần)
