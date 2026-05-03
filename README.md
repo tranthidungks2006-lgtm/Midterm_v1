@@ -6,7 +6,7 @@
 2. Các tính năng chính
     - Mô phỏng 3D: Tái hiện cổng trường và các landmark đặc trưng của UET.
     - Chế độ kép (Dual Mode): Tùy chọn giữa lái xe máy tốc độ cao và đi bộ.
-    - Hệ thống nạp tài nguyên thông minh:Sử dụng <AssetLoader> để quản lý đồng bộ các model.glb, đảm bảo game chỉ chạy khi mọi thứ đã sẵn sàng.
+    - Hệ thống nạp tài nguyên thông minh:Sử dụng AssetLoader để quản lý đồng bộ các model.glb, đảm bảo game chỉ chạy khi mọi thứ đã sẵn sàng.
     - Hiệu ứng Intro sáng tạo: Màn hình chờ sống động với hiệu ứng chuối rơi ngẫu nhiên.
     - UI/UX tối ưu: Giao diện người dùng được thiết kế bằng HTML/CSS đè lên lớp Canvas 3D, giúp hình ảnh sắc nét và dễ tương tác.
 
@@ -26,8 +26,10 @@
 4. Hướng dẫn sử dụng
     - Cách chạy dự án:
         Tải mã nguồn về máy tính. Đảm bảo bạn đã cài đặt Node.js.
-        Cài đặt dependencies bằng cách chạy lệnh <npm install>.
-        Chạy dự án bằng cách chạy lệnh <npm run dev>
+
+        Cài đặt dependencies bằng cách chạy lệnh npm install.
+
+        Chạy dự án bằng cách chạy lệnh npm run dev
     - Điều khiển game:
         Sử dụng các nút điều hướng để điều khiển hướng đi của nhân vật
 
