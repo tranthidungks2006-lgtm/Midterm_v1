@@ -1,7 +1,7 @@
 1. Giới thiệu dự án
-    WHERE IS UET'S GATE là một trò chơi 3D tương tác được phát triển bằng Theejs, mô phỏng cuộc hành trình đi tìm cổng UET của sing viên UET bằng các phương tiện khác nhau như xe máy, đi bộ hay cánh cửa thần kỳ(?). 
+    - WHERE IS UET'S GATE là một trò chơi 3D tương tác được phát triển bằng Theejs, mô phỏng cuộc hành trình đi tìm cổng UET của sing viên UET bằng các phương tiện khác nhau như xe máy, đi bộ hay cánh cửa thần kỳ(?). 
     
-    Dự án này nhằm mục đích tạo ra một trải nghiệm giải trí độc đáo, đồng thời giới thiệu về khả năng của Three.js trong việc xây dựng môi trường 3D phức tạp và tương tác. Người chơi sẽ được khám phá cổng trường và các landmark đặc trưng của UET. Đây hứa hẹn sẽ là một trò chơi thú vị, mang đậm dấu ấn của UET và sự sáng tạo của nhóm phát triển.
+    - Dự án này nhằm mục đích tạo ra một trải nghiệm giải trí độc đáo, đồng thời giới thiệu về khả năng của Three.js trong việc xây dựng môi trường 3D phức tạp và tương tác. Người chơi sẽ được khám phá cổng trường và các landmark đặc trưng của UET. Đây hứa hẹn sẽ là một trò chơi thú vị, mang đậm dấu ấn của UET và sự sáng tạo của nhóm phát triển.
 
 2. Các tính năng chính
     - Mô phỏng 3D: Tái hiện cổng trường và các landmark đặc trưng của UET.
@@ -13,14 +13,14 @@
 3. Cấu trúc mã nguồn
 
 /Wayfinder
-├── index.html          # Cấu trúc trang web và các lớp UI
-├── main.js             # Điểm khởi đầu, quản lý logic game chính
-├── assetLoader.js      # Xử lý nạp model 3D và texture
-├── environment.js      # Xây dựng bầu trời, mặt đất và sương mù
-├── intro.js            # Điều khiển màn hình giới thiệu (Intro Scene)
-├── pedestrian.js       # Logic di chuyển cho chế độ đi bộ
-├── motobike.js         # Logic di chuyển cho chế độ xe máy
-└── assets/             # Chứa model .glb và hình ảnh thiết kế
+- index.html          # Cấu trúc trang web và các lớp UI
+- main.js             # Điểm khởi đầu, quản lý logic game chính
+- assetLoader.js      # Xử lý nạp model 3D và texture
+- environment.js      # Xây dựng bầu trời, mặt đất và sương mù
+- intro.js            # Điều khiển màn hình giới thiệu (Intro Scene)
+- pedestrian.js       # Logic di chuyển cho chế độ đi bộ
+- motobike.js         # Logic di chuyển cho chế độ xe máy
+- public/             # Chứa model .glb và hình ảnh thiết kế
     
 
 4. Hướng dẫn sử dụng
@@ -32,10 +32,10 @@
         Sử dụng các nút điều hướng để điều khiển hướng đi của nhân vật
 
 5. Công nghệ sử dụng
-    Ngôn ngữ chính: JavaScript, HTML, CSS
-    Thư viện đồ họa: Three.js
-    Thiết kế Asset: Blender (Model 3D), Adobe Illustrator, Photoshop (UI/UX).
-    Quản lý mã nguồn: Git & GitHub Desktop.
+    - Ngôn ngữ chính: JavaScript, HTML, CSS
+    - Thư viện đồ họa: Three.js
+    - Thiết kế Asset: Blender (Model 3D), Adobe Illustrator, Photoshop (UI/UX).
+    - Quản lý mã nguồn: Git & GitHub Desktop.
 
 --------------------------------------------------------------------------------------------------------------
 Dự án được thực hiện bởi:
