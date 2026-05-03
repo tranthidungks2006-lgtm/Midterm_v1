@@ -64,8 +64,7 @@ export default class PedestrianGame {
             
             currentZ -= currentWidth;
         }
-        this.finishLine = currentZ; // Điểm thắng là cuối dải cuối cùng[cite: 5]
-
+        this.finishLine = currentZ; // Điểm thắng là cuối dải cuối cùng
         // 3. Cổng
         this.gate = this.loader.get('gate_kieu_mai');
         if (this.gate) {
@@ -170,7 +169,7 @@ export default class PedestrianGame {
 
         for (let treeBox of this.treeObstacles) {
             if (this.playerBox.intersectsBox(treeBox)) {
-                // Nếu chạm cây, quay về vị trí cũ (không cho đi qua)[cite: 5]
+                // Nếu chạm cây, quay về vị trí cũ (không cho đi qua)
                 this.playerGroup.position.copy(oldPos);
                 break;
             }
@@ -189,7 +188,6 @@ export default class PedestrianGame {
     }
     
 
-    // Trong Pedestrian.js
     clear() {
         // 1. Xóa nhân vật
         if (this.playerGroup) {

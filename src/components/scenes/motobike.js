@@ -20,7 +20,7 @@ export default class MotobikeGame {
         this.playerBox = new THREE.Box3();
         this.obstacleBox = new THREE.Box3();
 
-        this.minGap = 7.2; // 2.4 * 3
+        this.minGap = 10;
     }
 
     init(model) {
@@ -102,7 +102,6 @@ for (let i = 0; i < this.numCitySegments; i++) {
             : lanes;
         let selectedLane = availableLanes[Math.floor(Math.random() * availableLanes.length)];
 
-                // Đổi từ obs thành obstacle
         obstacle.position.set(selectedLane, 0, -120);
         
         this.scene.add(obstacle);

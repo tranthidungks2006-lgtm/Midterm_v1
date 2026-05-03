@@ -130,7 +130,6 @@ class WayfinderManager {
         }
     }
 
-    // TRONG main.js
     async onSelectMode(mode) {
         showLoadingScreen();
         await this.assetLoader.loadModeAssets(mode); // ĐỢI NẠP XONG HẾT

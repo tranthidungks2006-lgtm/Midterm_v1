@@ -137,7 +137,7 @@ export class AssetLoader {
             { name: 'sign_post', path: './model/d4.glb' },
             { name: 'obstacle_cone', path: './model/chan.glb'},
             { name: 'building_model', path: './model/daypho.glb'},
-            { name: 'player2', path: './model/xemay.glb' }
+            { name: 'player2', path: './model/xemay.glb', scale: 0.5 }
         ] : [
             { name: 'road2_model', path: './model/r2.glb' },
             { name: 'sidewalk_model', path: './model/s2.glb' },
