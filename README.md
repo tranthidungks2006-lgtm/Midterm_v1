@@ -20,6 +20,7 @@
 - intro.js            # Điều khiển màn hình giới thiệu (Intro Scene)
 - pedestrian.js       # Logic di chuyển cho chế độ đi bộ
 - motobike.js         # Logic di chuyển cho chế độ xe máy
+- leaderboard.js       #Logic điều khiển bảng xếp hạng người chơi.
 - public/             # Chứa model .glb và hình ảnh thiết kế
     
 
