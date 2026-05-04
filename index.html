@@ -20,6 +20,7 @@
 
         <div id="intro-screen" class="ui-layer hidden">
             <h1 style="font-size: 50px;">WHERE IS UET'S GATE?</h1>
+            <input id="player-name-input" type="text" placeholder="Nhập tên của bạn..." maxlength="20" />
             <button id="play-btn">HỌC LẦN ĐẦU</button>
         </div>
 
@@ -88,11 +89,27 @@
             <button id="retry-btn">CHƠI LẠI</button>
         </div>
 
-        <div id="leaderboard" class="hidden">
-            <h2>BẢNG XẾP HẠNG</h2>
-            <p>8% số sinh viên có xếp hạng cao nhất sẽ đạt học bổng</p>
-            <div id="rank-list"></div>
-            <button onclick="location.reload()">CHƠI LẠI</button>
+        <div id="win-screen" class="hidden overlay-screen">
+            <div class="win-icon">🏆</div>
+            <div class="win-title">CHÚC MỪNG!</div>
+            <div class="win-msg">Bạn đã tìm thấy cổng UET!<br>Hãy xem thứ hạng của bạn nhé.</div>
+            <button id="win-ok-btn">XEM BXH →</button>
+        </div>
+
+        <div id="leaderboard" class="hidden overlay-screen">
+            <div class="lb-panel"> 
+                <button id="lb-close-btn" class="lb-close-btn">✕</button>
+                <div class="lb-header"> 
+                   <div class="lb-header__label">Where is UET's Gate?</div>
+                   <h2 class="lb-header__title">LEADERBOARD</h2>
+                    <p>8% số sinh viên có xếp hạng cao nhất sẽ đạt học bổng</p>
+                   <span id="lb-mode-label" class="lb-mode-label"></span>
+                   <div class="lb-header__line"></div>
+                </div>
+                <div id="lb-stats"></div>
+                <div id="lb-board"></div>
+                <button id="lb-retry-btn">↩ CHƠI LẠI</button>
+            </div>
         </div>
     </div>
         

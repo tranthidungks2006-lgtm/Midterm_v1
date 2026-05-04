@@ -205,3 +205,46 @@ button:active {transform: scale(0.95);}
     cursor: pointer; 
     margin-top: 20px; 
 }
+
+/* ── Win Screen ─────────────────────────────────────────── */
+#win-screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(6px);
+    z-index: 500;
+    text-align: center;
+    padding: 20px;
+}
+ 
+#win-screen .win-icon   { font-size: 64px; margin-bottom: 16px; animation: win-bounce 0.6s ease; }
+#win-screen .win-title  { font-size: clamp(28px, 5vw, 42px); font-weight: 900; color: #4CAF50; margin-bottom: 12px; letter-spacing: 2px; }
+#win-screen .win-msg    { font-size: 18px; color: #D3EBD7; margin-bottom: 28px; line-height: 1.6; }
+ 
+@keyframes win-bounce {
+    0%   { transform: scale(0.5); opacity: 0; }
+    70%  { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+}
+ 
+#win-ok-btn {
+    background: #4CAF50;
+    padding: 12px 48px;
+    font-size: 18px;
+    border-radius: 50px;
+    letter-spacing: 2px;
+}
+#win-ok-btn:hover { background: #66BB6A; box-shadow: 0 0 20px rgba(76, 175, 80, 0.5); }
+ 
+/* ── Leaderboard retry btn ──────────────────────────────── */
+#lb-retry-btn {
+    display: block;
+    margin: 20px auto 0;
+    background: #179BC2;
+    padding: 10px 36px;
+    font-size: 15px;
+    border-radius: 50px;
+    letter-spacing: 2px;
+}
+#lb-retry-btn:hover { background: rgb(109, 234, 232, 75%); }

@@ -5,6 +5,7 @@ import IntroScene from './components/scenes/intro.js';
 import MotobikeGame from './components/scenes/motobike.js';
 import PedestrianGame from './components/scenes/Pedestrian.js';
 import { loadModel } from './utils/Loader.js';
+import { initLeaderboard, showLeaderboard, hideLeaderboard } from './components/scenes/leaderboard.js';
 
 class WayfinderManager {
     constructor() {
@@ -21,6 +22,8 @@ class WayfinderManager {
 
         this.startTime = 0;
         this.isAccelerating = false;
+        this.playerName = 'Ẩn danh'; // Lấy từ intro
+        this.currentMode = null;
 
         // UI Elements
         this.timeDisplay = document.getElementById('time-val');
@@ -64,10 +67,10 @@ class WayfinderManager {
             this.camera.lookAt(0, 0, 0);
 
             this.setupUI();
+            initLeaderboard(); // bind nút X và Chơi lại trong leaderboard
             this.animate();
 
             this.assetLoader.loadHiddenAssets().then(() => {
-                console.log("Đã nạp ngầm xong Cây và Cổng (nếu có).");
             });
             
         } catch (error) {
@@ -81,6 +84,8 @@ class WayfinderManager {
     setupUI() {
         // Play -> Tutorial
         document.getElementById('play-btn').onclick = () => {
+            const nameInput = document.getElementById('player-name-input');
+            this.playerName = nameInput?.value.trim() || 'Ẩn danh';
             document.getElementById('intro-screen').classList.add('hidden');
             document.getElementById('tutorial-screen').classList.remove('hidden');
         };
@@ -93,11 +98,13 @@ class WayfinderManager {
 
         // Chọn Motobike
         document.getElementById('choose-motobike').onclick = () => {
+            this.currentMode = 'motobike';
             this.handleModeSelection('motobike');
         };
 
         // Chọn Pedestrian
         document.getElementById('choose-pedestrian').onclick = () => {
+            this.currentMode = 'pedestrian';
             this.handleModeSelection('pedestrian');
         };
     }
@@ -226,12 +233,40 @@ class WayfinderManager {
                 }
             }
             
-            // Xử lý thắng thua (bổ sung hàm showGameOverScreen nếu cần)
-            if (status === "LOSE" || status === "WIN") {
+            // Xử lý thắng thua
+            if (status === "LOSE") {
                 this.currentStage = 'FINISHED';
                 this.showEndScreen(status);
+            } else if (status === "WIN") {
+                this.currentStage = 'FINISHED';
+                const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                this.showWinScreen(elapsed); // → Win screen → LB với callback restart
             }
         }
+    }
+
+    showWinScreen(elapsed) {
+        const screen = document.getElementById('win-screen');
+        const okBtn  = document.getElementById('win-ok-btn');
+        if (!screen) return;
+        screen.classList.remove('hidden');
+ 
+        okBtn.onclick = () => {
+            screen.classList.add('hidden');
+            showLeaderboard(this.playerName, this.currentMode, elapsed, () => this.restartToSelection());
+        };
+    }
+
+    restartToSelection() {
+        hideLeaderboard();
+        if (this.currentGame) { this.currentGame.clear(); this.currentGame = null; }
+        document.getElementById('game-stats').classList.add('hidden');
+        document.getElementById('game-over-screen')?.classList.add('hidden');
+        document.getElementById('win-screen')?.classList.add('hidden');
+        this.camera.position.set(0, 5, 10);
+        this.camera.lookAt(0, 0, 0);
+        document.getElementById('selection-screen').classList.remove('hidden');
+        this.currentStage = 'INTRO';
     }
 
     showEndScreen(status) {
@@ -240,41 +275,14 @@ class WayfinderManager {
         const msg = document.getElementById('result-message');
         const retryBtn = document.getElementById('retry-btn');
 
-        if (status === "WIN") {
-            title.innerText = "CHÚC MỪNG!";
-            title.style.color = "#4CAF50";
-            msg.innerText = "Bạn đã tìm thấy cổng UET!";
-        } else {
-            title.innerText = "GAME OVER";
-            title.style.color = "#FF5252";
-            msg.innerText = "Chưa tày đâuuu!";
-        }
-
+        title.innerText = "GAME OVER";
+        title.style.color = "#FF5252";
+        msg.innerText = "Chưa tày đâuuu!";
         screen.classList.remove('hidden');
-
-        // Xử lý nút Chơi lại
-        retryBtn.onclick = () => {
-            // 2. Dọn dẹp game hiện tại để tránh rác bộ nhớ
-            if (this.currentGame) {
-                this.currentGame.clear();
-                this.currentGame = null;
-            }
-            // 1. Ẩn màn hình kết thúc và HUD game
-            screen.classList.add('hidden');
-            document.getElementById('game-stats').classList.add('hidden');
-
-            // 3. Đưa camera về vị trí ban đầu của Intro để nhìn cho đẹp
-            this.camera.position.set(0, 5, 10);
-            this.camera.lookAt(0, 0, 0);
-
-            // 4. Hiển thị lại màn hình chọn Mode
-            document.getElementById('selection-screen').classList.remove('hidden');
-            
-            // 5. Cập nhật lại trạng thái quản lý[cite: 7]
-            this.currentStage = 'INTRO';
-        };
-    }
-
+ 
+        retryBtn.onclick = () => this.restartToSelection();
+        }
+        
     animate() {
         requestAnimationFrame(() => this.animate());
         this.update();
