@@ -237,14 +237,310 @@ button:active {transform: scale(0.95);}
 }
 #win-ok-btn:hover { background: #66BB6A; box-shadow: 0 0 20px rgba(76, 175, 80, 0.5); }
  
-/* ── Leaderboard retry btn ──────────────────────────────── */
-#lb-retry-btn {
+/* ══════════════════════════════════════════════════════════
+   LEADERBOARD  –  Game-style vertical board
+   ══════════════════════════════════════════════════════════ */
+
+/* Overlay backdrop */
+#leaderboard {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    z-index: 1100;
+}
+#leaderboard.hidden { display: none !important; }
+
+/* Main panel */
+.lb-panel {
+    position: relative;
+    width: min(420px, 92vw);
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 24px;
+    overflow: hidden;
+    /* Layered green border like the reference */
+    background:
+        linear-gradient(180deg, #c8e86b 0%, #8fc c34 50%, #6ab04c 100%);
+    box-shadow:
+        0 0 0 5px #4a8c2a,
+        0 0 0 9px #7cba3e,
+        0 12px 40px rgba(0,0,0,0.6);
+    padding: 0 0 20px 0;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.lb-header {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 18px 50px 10px 80px;
+    background: linear-gradient(180deg, #b5d94a 0%, #96c83a 100%);
+    border-bottom: 3px solid #4a8c2a;
+    min-height: 72px;
+}
+
+.lb-trophy-wrap {
+    position: absolute;
+    left: 8px;
+    bottom: -4px;
+    font-size: 52px;
+    line-height: 1;
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.4));
+    z-index: 2;
+}
+
+.lb-title {
+    font-family: 'Arial Black', 'Arial', sans-serif;
+    font-size: clamp(22px, 5vw, 30px);
+    font-weight: 900;
+    color: #fff;
+    text-shadow:
+        3px 3px 0 #d4730a,
+        -1px -1px 0 #c06000,
+        1px -1px 0 #c06000,
+        -1px 1px 0 #c06000,
+        0 4px 8px rgba(0,0,0,0.3);
+    letter-spacing: 3px;
+    margin: 0;
+    padding-bottom: 4px;
+}
+
+/* Close button — orange circle top-right */
+.lb-close-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff9a3c, #ff6600);
+    border: 3px solid #fff;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 900;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+    z-index: 10;
+}
+.lb-close-btn:hover {
+    transform: scale(1.12);
+    box-shadow: 0 5px 14px rgba(0,0,0,0.5);
+    background: linear-gradient(135deg, #ffb347, #ff8800);
+}
+
+/* ── Meta (mode + stats) ─────────────────────────────────── */
+.lb-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px 4px;
+}
+
+.lb-mode-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2d5a0e;
+    background: rgba(255,255,255,0.45);
+    padding: 3px 14px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+}
+
+.lb-stats-row {
+    display: flex;
+    gap: 18px;
+    font-size: 13px;
+    color: #2d5a0e;
+    font-weight: 600;
+}
+
+.lb-stat strong { color: #1a3a06; }
+
+/* ── Board list (scrollable) ─────────────────────────────── */
+.lb-board-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 14px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #4a8c2a #c8e86b;
+}
+.lb-board-list::-webkit-scrollbar { width: 5px; }
+.lb-board-list::-webkit-scrollbar-track { background: #c8e86b; border-radius: 4px; }
+.lb-board-list::-webkit-scrollbar-thumb { background: #4a8c2a; border-radius: 4px; }
+
+/* ── Single entry row ────────────────────────────────────── */
+.lb-entry {
+    display: grid;
+    grid-template-columns: 44px 46px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 4px;
+    border-bottom: 2px dashed rgba(74,140,42,0.45);
+    animation: lb-slide-in 0.3s ease both;
+}
+.lb-entry:last-child { border-bottom: none; }
+
+@keyframes lb-slide-in {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Rank badge */
+.lb-rank-badge {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+/* Medal styles for top 3 */
+.lb-entry--rank1 .lb-rank-badge {
+    background: radial-gradient(circle at 35% 35%, #ffe066, #e6a800);
+    border: 3px solid #c47f00;
+    box-shadow: 0 3px 8px rgba(180,120,0,0.5);
+    font-size: 22px;
+}
+.lb-entry--rank2 .lb-rank-badge {
+    background: radial-gradient(circle at 35% 35%, #e8e8f0, #9fa8b8);
+    border: 3px solid #6e7a8a;
+    box-shadow: 0 3px 8px rgba(100,110,130,0.4);
+    font-size: 22px;
+}
+.lb-entry--rank3 .lb-rank-badge {
+    background: radial-gradient(circle at 35% 35%, #f5c97a, #c47a2b);
+    border: 3px solid #8b4f0e;
+    box-shadow: 0 3px 8px rgba(140,80,14,0.4);
+    font-size: 22px;
+}
+/* Plain rank number for 4+ */
+.lb-entry:not(.lb-entry--rank1):not(.lb-entry--rank2):not(.lb-entry--rank3) .lb-rank-badge {
+    background: rgba(255,255,255,0.35);
+    border: 2px solid rgba(74,140,42,0.5);
+    color: #2d5a0e;
+    font-size: 16px;
+}
+
+/* Avatar placeholder */
+.lb-avatar {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #e8c97a, #d4a843);
+    border: 3px solid #b88a30;
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), 0 2px 6px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+}
+
+/* Player info */
+.lb-player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.lb-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a3a06;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+}
+
+.lb-date {
+    font-size: 11px;
+    color: #4a7a20;
+}
+
+/* Score block (star + time) */
+.lb-score-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    flex-shrink: 0;
+}
+
+.lb-star {
+    font-size: 20px;
+    line-height: 1;
+    filter: drop-shadow(1px 1px 2px rgba(180,120,0,0.5));
+}
+
+.lb-time-badge {
+    background: linear-gradient(135deg, #f5c518, #e6a800);
+    color: #5c3a00;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 8px;
+    border: 2px solid #c47f00;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Delete button */
+.lb-delete {
+    display: none; /* hidden by default; shown on hover */
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(200,30,30,0.7);
+    border: none;
+    color: #fff;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+.lb-entry:hover .lb-delete { display: flex; align-items: center; justify-content: center; }
+
+/* Empty state */
+.lb-empty {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 30px 0;
+    color: #2d5a0e;
+    font-size: 15px;
+    gap: 8px;
+}
+.lb-empty-icon { font-size: 40px; }
+
+/* ── Retry button ────────────────────────────────────────── */
+.lb-retry-btn {
     display: block;
-    margin: 20px auto 0;
-    background: #179BC2;
+    margin: 14px auto 0;
+    background: linear-gradient(135deg, #ff9a3c, #ff6600);
+    border: 3px solid #fff;
+    color: #fff;
     padding: 10px 36px;
     font-size: 15px;
     border-radius: 50px;
     letter-spacing: 2px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-weight: 700;
+    transition: transform 0.15s, box-shadow 0.15s;
 }
-#lb-retry-btn:hover { background: rgb(109, 234, 232, 75%); }
+.lb-retry-btn:hover {
+    background: linear-gradient(135deg, #ffb347, #ff8800);
+    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}

@@ -141,21 +141,26 @@ function render() {
         return;
     }
 
+    // Avatar emoji pool based on rank
+    const avatarEmojis = ['🧑‍🎓', '😎', '🦸', '🐱', '🦊', '🐸', '🤖', '👾'];
+
     boardEl.innerHTML = sorted.map((e, i) => {
-        const rank   = i + 1;
-        const medal  = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+        const rank    = i + 1;
+        const medal   = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
         const rankCls = rank <= 3 ? `lb-entry--rank${rank}` : '';
+        const avatar  = avatarEmojis[(e.name.charCodeAt(0) || 0) % avatarEmojis.length];
 
         return `
-        <div class="lb-entry ${rankCls}" style="animation-delay:${i * 0.04}s">
-            <div class="lb-rank">${medal}</div>
-            <div class="lb-player">
+        <div class="lb-entry ${rankCls}" style="animation-delay:${i * 0.05}s; position:relative;">
+            <div class="lb-rank-badge">${medal}</div>
+            <div class="lb-avatar">${avatar}</div>
+            <div class="lb-player-info">
                 <span class="lb-name">${e.name}</span>
                 <span class="lb-date">${e.date}</span>
             </div>
-            <div class="lb-time">
-                <span class="lb-time-val">${fmtTime(e.totalSec)}</span>
-                <span class="lb-time-lbl">MM:SS</span>
+            <div class="lb-score-block">
+                <span class="lb-star">⭐</span>
+                <span class="lb-time-badge">${fmtTime(e.totalSec)}</span>
             </div>
             <button class="lb-delete" onclick="deleteEntry_lb(${e.id})" title="Xóa">✕</button>
         </div>`;

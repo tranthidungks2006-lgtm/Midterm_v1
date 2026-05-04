@@ -97,18 +97,27 @@
         </div>
 
         <div id="leaderboard" class="hidden overlay-screen">
-            <div class="lb-panel"> 
-                <button id="lb-close-btn" class="lb-close-btn">✕</button>
-                <div class="lb-header"> 
-                   <div class="lb-header__label">Where is UET's Gate?</div>
-                   <h2 class="lb-header__title">LEADERBOARD</h2>
-                    <p>8% số sinh viên có xếp hạng cao nhất sẽ đạt học bổng</p>
-                   <span id="lb-mode-label" class="lb-mode-label"></span>
-                   <div class="lb-header__line"></div>
+            <div class="lb-panel">
+                <!-- Header -->
+                <div class="lb-header">
+                    <div class="lb-trophy-wrap">
+                        <span class="lb-trophy-icon">🏆</span>
+                    </div>
+                    <h2 class="lb-title">LEADERBOARD</h2>
+                    <button id="lb-close-btn" class="lb-close-btn">✕</button>
                 </div>
-                <div id="lb-stats"></div>
-                <div id="lb-board"></div>
-                <button id="lb-retry-btn">↩ CHƠI LẠI</button>
+
+                <!-- Mode + Stats -->
+                <div class="lb-meta">
+                    <span id="lb-mode-label" class="lb-mode-label"></span>
+                    <div id="lb-stats" class="lb-stats-row"></div>
+                </div>
+
+                <!-- Entry list -->
+                <div id="lb-board" class="lb-board-list"></div>
+
+                <!-- Replay button -->
+                <button id="lb-retry-btn" class="lb-retry-btn">↩ CHƠI LẠI</button>
             </div>
         </div>
     </div>
