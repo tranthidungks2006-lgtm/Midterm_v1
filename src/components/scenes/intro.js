@@ -7,6 +7,7 @@ export default class IntroScene {
         this.group = new THREE.Group();
         this.playerModel = null;
         this.bananas = [];
+        this.bgm = null;
     }
 
     init() {
@@ -53,7 +54,46 @@ export default class IntroScene {
 
         this.scene.add(this.group);
         this.group.position.set(0, 0, 0);
+
+        const audioBuffer = this.assetLoader.getAudio('intro_bgm');
+        if (audioBuffer) {
+            const listener = new THREE.AudioListener();
+            // Bạn cần thêm listener này vào camera ở main.js hoặc truyền vào đây
+            this.bgm = new THREE.Audio(listener);
+            this.bgm.setBuffer(audioBuffer);
+            this.bgm.setLoop(true);
+            this.bgm.setVolume(0.5);
+            
+            const startMusic = () => {
+                if (this.bgm && !this.bgm.isPlaying) {
+                    this.bgm.play();
+                }
+                window.removeEventListener('click', startMusic);
+            };
+            window.addEventListener('click', startMusic);
+        }
         
+    }
+
+    fadeOutBGM(duration = 1.5) {
+        if (!this.bgm || !this.bgm.isPlaying) return;
+
+        const initialVolume = this.bgm.getVolume();
+        const startTime = performance.now();
+
+        const fade = (currentTime) => {
+            const elapsed = (currentTime - startTime) / 1000;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            this.bgm.setVolume(initialVolume * (1 - progress));
+
+            if (progress < 1) {
+                requestAnimationFrame(fade);
+            } else {
+                this.bgm.stop();
+            }
+        };
+        requestAnimationFrame(fade);
     }
 
     update() {
@@ -81,10 +121,10 @@ export default class IntroScene {
     }
 
     clear() {
+        this.fadeOutBGM(1.0);
         this.scene.remove(this.group);
-        this.bananas.forEach(banana => {
-        this.scene.remove(banana);
-    });
-    this.bananas = [];
+        this.bananas.forEach(banana => {this.scene.remove(banana);});
+        this.bananas = [];
+    if (this.bgm && this.bgm.isPlaying) {this.bgm.stop();}
     }
 }

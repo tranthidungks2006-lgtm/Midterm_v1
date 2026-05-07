@@ -13,6 +13,8 @@ export class AssetLoader {
         this.dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
         this.gltfLoader = new GLTFLoader();
         this.gltfLoader.setDRACOLoader(this.dracoLoader);
+        this.audioLoader = new THREE.AudioLoader();
+        this.sounds = new Map();
 
 
     }
@@ -87,6 +89,15 @@ export class AssetLoader {
             }
         } catch (e) {
             console.error("Lỗi nạp Luffy Intro:", e);
+        }
+
+        console.log("🎵 Đang nạp nhạc Intro...");
+        try {
+            const audioBuffer = await this._loadAudio('/sounds/intro_music.mp3');
+            this.sounds.set('intro_bgm', audioBuffer);
+            console.log("✅ Đã nạp xong nhạc Intro!");
+        } catch (e) {
+            console.error("Lỗi nạp nhạc Intro:", e);
         }
     
         this.isReady = true;
@@ -191,6 +202,20 @@ export class AssetLoader {
         });
     }
 
+    _loadAudio(path) {
+    return new Promise((resolve) => {
+        this.audioLoader.load(
+            path,
+            (buffer) => resolve(buffer),
+            undefined,
+            (err) => {
+                console.error("Lỗi nạp file âm thanh:", path);
+                resolve(null);
+            }
+        );
+    });
+}
+
     get(name) {
         // 1. Kiểm tra xem có model thật (.glb) trong Map assets không
         if (this.assets.has(name)) {
@@ -213,6 +238,11 @@ export class AssetLoader {
         console.warn(`Không tìm thấy gì cho: ${name}`);
         return this.createBox(1, 1, 1, 0xffffff);
     }
+
+
+        getAudio(name) {
+            return this.sounds.get(name);
+        }
 
     createBox(w, h, d, color) {
         const mesh = new THREE.Mesh(

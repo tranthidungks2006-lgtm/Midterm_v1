@@ -88,6 +88,7 @@ class WayfinderManager {
             this.playerName = nameInput?.value.trim() || 'Ẩn danh';
             document.getElementById('intro-screen').classList.add('hidden');
             document.getElementById('tutorial-screen').classList.remove('hidden');
+            
         };
 
         // Tutorial -> Selection
