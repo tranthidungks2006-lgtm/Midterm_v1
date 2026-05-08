@@ -71,6 +71,20 @@ export default class PedestrianGame {
             this.gate.position.set(0, 0, this.finishLine); 
             this.scene.add(this.gate);
         }
+
+        // Thiết lập âm thanh môi trường
+        const listener = new THREE.AudioListener();
+        this.playerGroup.add(listener);
+
+        this.ambientSound = new THREE.Audio(listener);
+        const ambientBuffer = this.loader.getAudio('city_ambient');
+
+        if (ambientBuffer) {
+            this.ambientSound.setBuffer(ambientBuffer);
+            this.ambientSound.setLoop(true);
+            this.ambientSound.setVolume(0.3); // Để nhỏ thôi cho đúng chất âm thanh nền
+            this.ambientSound.play();
+        }
     }
 
     createStrip(zPos, index, width) {
@@ -201,6 +215,9 @@ export default class PedestrianGame {
     
 
     clear() {
+        if (this.ambientSound && this.ambientSound.isPlaying) {
+            this.ambientSound.stop();
+        }
         // 1. Xóa nhân vật
         if (this.playerGroup) {
             this.scene.remove(this.playerGroup);

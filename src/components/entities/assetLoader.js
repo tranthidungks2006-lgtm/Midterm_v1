@@ -99,6 +99,15 @@ export class AssetLoader {
         } catch (e) {
             console.error("Lỗi nạp nhạc Intro:", e);
         }
+
+        console.log("🎵 Đang nạp nhạc chiến thắng...");
+        try {
+            const winAudio = await this._loadAudio('/sounds/win_music.mp3'); 
+            this.sounds.set('win_bgm', winAudio);
+            console.log("✅ Đã nạp xong nhạc chiến thắng!");
+        } catch (e) {
+            console.error("Lỗi nạp nhạc thắng:", e);
+        }
     
         this.isReady = true;
         return Promise.resolve();
@@ -133,6 +142,14 @@ export class AssetLoader {
         }
 
         console.log("Đã nạp ngầm xong Cây và Cổng Kiều Mai!");
+
+        try {
+            const crashAudio = await this._loadAudio('/sounds/va_cham.mp3'); // Đường dẫn file của bạn
+            this.sounds.set('crash_sound', crashAudio);
+            console.log("✅ Đã nạp xong âm thanh va chạm!");
+        } catch (e) {
+            console.error("Lỗi nạp âm thanh va chạm:", e);
+        }
     }
 
     async loadModeAssets(mode) {
@@ -173,6 +190,34 @@ export class AssetLoader {
             let loaded = files.indexOf(file) + 1;
             if (barFill) barFill.style.width = `${(loaded / files.length) * 100}%`;
         }
+
+        if (mode === 'motobike') {
+            console.log("🎵 Đang nạp âm thanh xe máy...");
+            const audioFiles = [
+                { name: 'motor_idle', path: './sounds/xmay_dchay.mp3' },
+                { name: 'motor_accel', path: './sounds/xmay_ttoc.mp3' }
+            ];
+
+            for (const audio of audioFiles) {
+                const buffer = await this._loadAudio(audio.path);
+                if (buffer) {
+                    this.sounds.set(audio.name, buffer);
+                    console.log(`✅ Đã nạp xong âm thanh: ${audio.name}`);
+                }
+            }
+        }
+
+        if (mode === 'pedestrian') {
+            console.log("🏙️ Đang nạp âm thanh thành phố...");
+            try {
+                const cityAudio = await this._loadAudio('/sounds/duongHN.mp3'); 
+                this.sounds.set('city_ambient', cityAudio);
+                console.log("✅ Đã nạp xong âm thanh thành phố!");
+            } catch (e) {
+                console.error("Lỗi nạp âm thanh thành phố:", e);
+            }
+        }
+
         this.isReady = true;
         this.isLoadingMode = false;
     }

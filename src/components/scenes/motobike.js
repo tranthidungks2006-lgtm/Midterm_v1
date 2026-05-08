@@ -57,38 +57,72 @@ export default class MotobikeGame {
             this.scene.add(seg);
         }
 
-// --- KHỞI TẠO DÃY PHỐ (CITY SEGMENTS) ---
-const cityAsset = this.loader.get('building_model');
-const cityBox = new THREE.Box3().setFromObject(cityAsset);
-this.cityBlockLength = cityBox.max.z - cityBox.min.z; 
+        // --- KHỞI TẠO DÃY PHỐ (CITY SEGMENTS) ---
+        const cityAsset = this.loader.get('building_model');
+        const cityBox = new THREE.Box3().setFromObject(cityAsset);
+        this.cityBlockLength = cityBox.max.z - cityBox.min.z; 
 
-this.citySegments = [];
-// Số lượng segment dãy phố (nên khớp với số lượng segment đường để đồng bộ)
-this.numCitySegments = this.numSegments || 4; 
+        this.citySegments = [];
+        // Số lượng segment dãy phố (nên khớp với số lượng segment đường để đồng bộ)
+        this.numCitySegments = this.numSegments || 4; 
 
-const cityMargin = 1; // Khoảng cách từ mép đường đến dãy phố
-const citySideOffset = (roadWidth / 2) + cityMargin;
+        const cityMargin = 1; // Khoảng cách từ mép đường đến dãy phố
+        const citySideOffset = (roadWidth / 2) + cityMargin;
 
-for (let i = 0; i < this.numCitySegments; i++) {
-    // Tạo 2 dãy phố cho 2 bên đường
-    const leftSide = cityAsset.clone();
-    const rightSide = cityAsset.clone();
+        for (let i = 0; i < this.numCitySegments; i++) {
+            // Tạo 2 dãy phố cho 2 bên đường
+            const leftSide = cityAsset.clone();
+            const rightSide = cityAsset.clone();
 
-    const zPos = i * -this.cityBlockLength;
+            const zPos = i * -this.cityBlockLength;
 
-    // Đặt vị trí bên trái
-    leftSide.position.set(-citySideOffset, 0, zPos);
-    
-    // Đặt vị trí bên phải và xoay mặt lại (nếu cần)
-    rightSide.position.set(citySideOffset, 0, zPos);
-    rightSide.rotation.y = Math.PI;
+            // Đặt vị trí bên trái
+            leftSide.position.set(-citySideOffset, 0, zPos);
+            
+            // Đặt vị trí bên phải và xoay mặt lại (nếu cần)
+            rightSide.position.set(citySideOffset, 0, zPos);
+            rightSide.rotation.y = Math.PI;
 
-    this.scene.add(leftSide);
-    this.scene.add(rightSide);
+            this.scene.add(leftSide);
+            this.scene.add(rightSide);
 
-    // Lưu vào mảng để quản lý update
-    this.citySegments.push({ left: leftSide, right: rightSide });
-}    }
+            // Lưu vào mảng để quản lý update
+            this.citySegments.push({ left: leftSide, right: rightSide });
+        }    
+
+        // Thiết lập âm thanh
+        const listener = new THREE.AudioListener();
+        this.playerGroup.add(listener); // Cho listener đi theo xe
+
+        this.motorIdle = new THREE.Audio(listener);
+        this.motorAccel = new THREE.Audio(listener);
+
+        const idleBuffer = this.loader.getAudio('motor_idle');
+        const accelBuffer = this.loader.getAudio('motor_accel');
+
+        if (idleBuffer) {
+            this.motorIdle.setBuffer(idleBuffer);
+            this.motorIdle.setLoop(true);
+            this.motorIdle.setVolume(0.4);
+            this.motorIdle.play(); // Mặc định vào game là nổ máy chờ
+        }
+
+        if (accelBuffer) {
+            this.motorAccel.setBuffer(accelBuffer);
+            this.motorAccel.setLoop(true);
+            this.motorAccel.setVolume(0.6);
+        }
+
+        this._onKeyDown = (e) => {
+            if (e.code === 'ArrowUp') this.setAccelerating(true);
+        };
+        this._onKeyUp = (e) => {
+            if (e.code === 'ArrowUp') this.setAccelerating(false);
+        };
+
+        window.addEventListener('keydown', this._onKeyDown);
+        window.addEventListener('keyup', this._onKeyUp);
+    }
 
     // Đổi tên cho đồng nhất với hàm update
     spawnObstacle(excludeLane = null) {
@@ -206,6 +240,36 @@ for (let i = 0; i < this.numCitySegments; i++) {
         this.buildings.instanceMatrix.needsUpdate = true;
     }
 
+    setAccelerating(isUpPressed) {
+        if (this.isGameOver) {
+            if(this.motorIdle.isPlaying) this.motorIdle.stop();
+            if(this.motorAccel.isPlaying) this.motorAccel.stop();
+            return;
+        }
+
+        if (isUpPressed) {
+            // Nếu đang nhấn phím lên: Bật tiếng tăng tốc, tắt tiếng idle
+            if (this.motorIdle.isPlaying) this.motorIdle.pause();
+            if (!this.motorAccel.isPlaying) this.motorAccel.play();
+        } else {
+            // Nếu thả phím lên: Bật tiếng idle, tắt tiếng tăng tốc
+            if (this.motorAccel.isPlaying) this.motorAccel.pause();
+            if (!this.motorIdle.isPlaying) this.motorIdle.play();
+        }
+    }
+
+    setAccelerating(active) {
+        if (this.isGameOver) return;
+
+        if (active) {
+            if (this.motorIdle.isPlaying) this.motorIdle.pause();
+            if (!this.motorAccel.isPlaying) this.motorAccel.play();
+        } else {
+            if (this.motorAccel.isPlaying) this.motorAccel.pause();
+            if (!this.motorIdle.isPlaying) this.motorIdle.play();
+        }
+    }
+
     handleInput(keyCode) {
         if (this.isGameOver) return;
         if (keyCode === 'ArrowLeft') this.currentLane = Math.max(-1, this.currentLane - 1);
@@ -216,6 +280,13 @@ for (let i = 0; i < this.numCitySegments; i++) {
 
     // Trong motobike.js
     clear() {
+        // 1. QUAN TRỌNG: Gỡ bỏ sự kiện bàn phím
+        window.removeEventListener('keydown', this._onKeyDown);
+        window.removeEventListener('keyup', this._onKeyUp);
+
+        // 2. Dừng âm thanh
+        if (this.motorIdle && this.motorIdle.isPlaying) this.motorIdle.stop();
+        if (this.motorAccel && this.motorAccel.isPlaying) this.motorAccel.stop();
         // 1. Xóa nhân vật
         if (this.playerGroup) {
             this.scene.remove(this.playerGroup);

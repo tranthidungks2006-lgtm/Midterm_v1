@@ -24,6 +24,7 @@ class WayfinderManager {
         this.isAccelerating = false;
         this.playerName = 'Ẩn danh'; // Lấy từ intro
         this.currentMode = null;
+        this.winSound = null;
 
         // UI Elements
         this.timeDisplay = document.getElementById('time-val');
@@ -236,6 +237,7 @@ class WayfinderManager {
             
             // Xử lý thắng thua
             if (status === "LOSE") {
+                this.playSFX('crash_sound');
                 this.currentStage = 'FINISHED';
                 this.showEndScreen(status);
             } else if (status === "WIN") {
@@ -246,10 +248,34 @@ class WayfinderManager {
         }
     }
 
+    playSFX(name) {
+        const audioBuffer = this.assetLoader.getAudio(name);
+        if (audioBuffer) {
+            const listener = new THREE.AudioListener();
+            this.camera.add(listener); // Gắn vào camera để nghe rõ nhất
+            const sound = new THREE.Audio(listener);
+            sound.setBuffer(audioBuffer);
+            sound.setVolume(0.6);
+            sound.play();
+        }
+    }
+
     showWinScreen(elapsed) {
         const screen = document.getElementById('win-screen');
         const okBtn  = document.getElementById('win-ok-btn');
         if (!screen) return;
+
+        const audioBuffer = this.assetLoader.getAudio('win_bgm');
+        if (audioBuffer) {
+            const listener = new THREE.AudioListener();
+            this.camera.add(listener); // Gắn listener vào camera
+            this.winSound = new THREE.Audio(listener);
+            this.winSound.setBuffer(audioBuffer);
+            this.winSound.setLoop(true); // Chạy xuyên suốt
+            this.winSound.setVolume(0.5);
+            this.winSound.play();
+        }
+
         screen.classList.remove('hidden');
  
         okBtn.onclick = () => {
@@ -259,6 +285,9 @@ class WayfinderManager {
     }
 
     restartToSelection() {
+        if (this.winSound && this.winSound.isPlaying) {
+            this.winSound.stop();
+        }
         hideLeaderboard();
         if (this.currentGame) { this.currentGame.clear(); this.currentGame = null; }
         document.getElementById('game-stats').classList.add('hidden');
