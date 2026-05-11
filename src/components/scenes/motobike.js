@@ -179,6 +179,20 @@ export default class MotobikeGame {
             if (seg.position.z > this.roadLength) seg.position.z -= totalLength;
         });
 
+        // --- THÊM ĐOẠN NÀY ĐỂ TÒA NHÀ TRÔI ---
+        const totalCityLength = this.numCitySegments * this.cityBlockLength;
+        this.citySegments.forEach(seg => {
+            // Cập nhật cho cả 2 bên trái và phải
+            seg.left.position.z += speed;
+            seg.right.position.z += speed;
+
+            // Nếu trôi quá màn hình (ví dụ > roadLength), teleport về phía xa
+            if (seg.left.position.z > this.cityBlockLength) {
+                seg.left.position.z -= totalCityLength;
+                seg.right.position.z -= totalCityLength;
+            }
+        });
+
         // 3. Va chạm & Di chuyển vật cản
         this.playerBox.setFromObject(this.playerGroup).expandByScalar(-0.15);
 
